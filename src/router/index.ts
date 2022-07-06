@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 import Home from "../views/Home.vue";
 
+// TODO 파일 이름의 소문자를 path로, 파스칼케이스로 name 설정
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
