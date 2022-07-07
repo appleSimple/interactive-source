@@ -2,7 +2,7 @@
   <aside id="sideBar">
     <ul class="menu-wrapper">
       <li v-for="(menu, index) in menus" :key="index">
-        {{ menu.name }}
+        <router-link :to="menu.url ?? ''">{{ menu.title }}</router-link>
       </li>
     </ul>
   </aside>
@@ -10,28 +10,20 @@
 
 <script lang="ts">
 import { Options, Vue } from "vue-class-component";
+import { navItems, NavData } from "../_nav";
 
 @Options({
   name: "SideBar",
 })
 export default class SideBar extends Vue {
+  menus: NavData[] = navItems;
+
   data() {
-    return {
-      menus: [
-        {
-          name: "first",
-          route: "/first",
-        },
-        {
-          name: "second",
-          route: "/second",
-        },
-        {
-          name: "third",
-          route: "/third",
-        },
-      ],
-    };
+    return {};
+  }
+
+  created() {
+    console.log(navItems);
   }
 }
 </script>
@@ -44,6 +36,9 @@ export default class SideBar extends Vue {
   box-shadow: 1px 1px 8px #a0a0a0;
 
   .menu-wrapper {
+    li {
+      cursor: pointer;
+    }
   }
 }
 </style>
