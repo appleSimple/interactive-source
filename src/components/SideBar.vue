@@ -4,28 +4,24 @@
       <li v-for="(menu, index) in menus" :key="index">
         <router-link :to="menu.url ?? ''">{{ menu.title }}</router-link>
       </li>
+      <button @click="count++">{{ count }}</button>
     </ul>
   </aside>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { Options, Vue } from "vue-class-component";
 import { navItems, NavData } from "../_nav";
+import { onMounted, ref } from "vue";
+import type { Ref } from "vue";
 
-@Options({
-  name: "SideBar",
-})
-export default class SideBar extends Vue {
-  menus: NavData[] = navItems;
+const menus: NavData[] = navItems;
+const count: Ref<number> = ref(1);
 
-  data() {
-    return {};
-  }
-
-  created() {
-    console.log(navItems);
-  }
-}
+onMounted(() => {
+  console.log("this", this);
+  console.log("this.count", count);
+});
 </script>
 
 <style lang="scss" scoped>
