@@ -12,15 +12,42 @@
 <script setup lang="ts">
 import { Options, Vue } from "vue-class-component";
 import { navItems, NavData } from "../_nav";
-import { onMounted, ref } from "vue";
+import {
+  computed,
+  onMounted,
+  reactive,
+  readonly,
+  ref,
+  UnwrapNestedRefs,
+} from "vue";
 import type { Ref } from "vue";
 
 const menus: NavData[] = navItems;
 const count: Ref<number> = ref(1);
+const plusCount = computed({
+  get: () => count.value + 1,
+  set: (getVal) => {
+    console.log(getVal);
+    count.value = getVal - 5;
+  },
+});
+const length = ref(50);
+const reactiveObj: UnwrapNestedRefs<any> = reactive({ length });
+const reactiveArr: UnwrapNestedRefs<any> = reactive([length, length]);
+const mapArr: UnwrapNestedRefs<any> = reactive(
+  new Map([
+    ["count", ref(0)],
+    ["hi", ref(3)],
+  ])
+);
+const copyReactiveObj = readonly(reactiveObj);
 
 onMounted(() => {
-  console.log("this", this);
-  console.log("this.count", count);
+  length.value++;
+  console.log("reactiveObj", reactiveObj.length);
+
+  console.log("copyReactiveObj", copyReactiveObj.length);
+  copyReactiveObj.length.value++;
 });
 </script>
 
