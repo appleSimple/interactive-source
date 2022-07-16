@@ -8,10 +8,14 @@
 <script setup lang="ts">
 import { onMounted } from "@vue/runtime-core";
 
-let gl: any;
+let gl: any; // WebGL 객체
+let shaderProgram: any; // 쉐이더 프로그램
+let vertexPositionAttribute: any; // 수직
+let gl_FragColor: any;
 
 onMounted(() => {
   loadCanvas();
+  initShaders();
 });
 
 const loadCanvas = (): void => {
@@ -20,7 +24,7 @@ const loadCanvas = (): void => {
   gl = initWebGL(glCanvas);
 
   if (gl) {
-    // set clear color to black
+    // 투명한 색상의 캔버스를 black으로 변경
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
 
     // 깊이 테스트
@@ -56,28 +60,36 @@ const initWebGL = (canvas: any): HTMLElement => {
 
 /** 쉐이더 초기화 */
 const initShaders = (): void => {
-  // // 조각 쉐이더 - id : shader-fs
-  // let fragmentShader = getShader(gl, 'shader-fs');
-  // // 정점 쉐이더 - id : shader-vs
-  // let vertexShader = getShader(gl, 'shader-vs');
-  // // 쉐이더 프로그램 생성
-  // shaderProgram = gl.createProgram();
-  // // 생성한 2개의 쉐이더를 붙인다.
-  // gl.attachShader(shaderProgram, vertexShader);
-  // gl.attachShader(shaderProgram, fragmentShader);
-  // // 2개의 쉐이더를 연결한다.
-  // gl.linkProgram(shaderProgram);
-  // // LINK_STATUS 확인
-  // if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
-  // 	alert('Unable to initialize the shader program.');
-  // }
-  // gl.useProgram(shaderProgram);
-  // vertexPositionAttribute = gl.getAttribLocation(shaderProgram, 'aVertexPosition');
-  // gl.enableVertexAttribArray(vertexPositionAttribute);
+  // 조각 쉐이더 - id : shader-fs
+  let fragmentShader = getShader(gl, "shader-fs");
+  // 정점 쉐이더 - id : shader-vs
+  let vertexShader = getShader(gl, "shader-vs");
+
+  // 쉐이더 프로그램 생성
+  shaderProgram = gl.createProgram();
+  // 생성한 2개의 쉐이더를 붙인다.
+  gl.attachShader(shaderProgram, vertexShader);
+  gl.attachShader(shaderProgram, fragmentShader);
+  // 2개의 쉐이더를 연결한다.
+  gl.linkProgram(shaderProgram);
+  // LINK_STATUS 확인
+  if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+    alert("Unable to initialize the shader program.");
+  }
+
+  gl.useProgram(shaderProgram);
+
+  // getAttribLocation() : 프로그램 위치 반환
+  vertexPositionAttribute = gl.getAttribLocation(
+    shaderProgram,
+    "aVertexPosition"
+  );
+  gl.enableVertexAttribArray(vertexPositionAttribute);
 };
 
-const getShader = (gl: HTMLElement, id: string): any => {
-  let shaderScript, theSource, currentChild, shader;
+/** 쉐이더 불러오기 */
+const getShader = (gl: any, id: string): any => {
+  let shaderScript: any, theSource, currentChild, shader;
 
   shaderScript = document.getElementById(id);
 
@@ -96,6 +108,28 @@ const getShader = (gl: HTMLElement, id: string): any => {
 
     currentChild = currentChild.nextSibling;
   }
+
+  if (shaderScript.type === "x-shader/x-fragment") {
+    shader = gl.createShader(gl.FRAGMENT_SHADER);
+  } else if (shaderScript.type === "x-shader/x-vertex") {
+    shader = gl.createShader(gl.VERTEX_SHADER);
+  } else {
+    return null;
+  }
+
+  gl.shaderSource(shader, theSource);
+
+  gl.compileShader(shader);
+
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+    alert(
+      "An error occured compiling the shader: " + gl.getShaderInfoLog(shader)
+    );
+
+    return null;
+  }
+
+  return shader;
 };
 </script>
 
